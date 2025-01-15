@@ -1,21 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>io.github.perplexhub</groupId>
+		<groupId>io.github.itineric</groupId>
 		<artifactId>rsql</artifactId>
 		<version>6.0.24-SNAPSHOT</version>
 	</parent>
 	<artifactId>rsql-jpa</artifactId>
 	<packaging>jar</packaging>
-	<name>io.github.perplexhub - RSQL-JPA</name>
+	<name>io.github.itineric - RSQL-JPA</name>
 	<dependencies>
 		<dependency>
-			<groupId>io.github.perplexhub</groupId>
+			<groupId>io.github.itineric</groupId>
 			<artifactId>rsql-common</artifactId>
 			<version>6.0.24-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>io.github.perplexhub</groupId>
+			<groupId>io.github.itineric</groupId>
 			<artifactId>rsql-common</artifactId>
 			<version>6.0.24-SNAPSHOT</version>
 			<type>test-jar</type>

@@ -4,25 +4,8 @@ on: workflow_dispatch
 
 jobs:
   release:
-    runs-on: ubuntu-latest
-    
     if: github.actor == github.event.repository.owner.login
-
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.git_token }}
-    - name: Set up JDK 17
-      uses: actions/setup-java@v1
-      with:
-        java-version: 17
-    - name: Build and publish release with Maven
-      uses: perplexhub/action-maven-publish-release@master
-      with:
-        gpg_private_key: ${{ secrets.gpg_private_key }}
-        gpg_passphrase: ${{ secrets.gpg_passphrase }}
-        nexus_username: ${{ secrets.nexus_username }}
-        nexus_password: ${{ secrets.nexus_password }}
-        git_username: perplexhub
-        git_email: ${{ secrets.git_email }}
-        git_origin_url: https://perplexhub:${{ secrets.git_token }}@github.com/perplexhub/rsql-jpa-specification.git 
+    uses: ./.github/workflows/build-and-publish.yml
+    with:
+      deploy-profile: release
+    secrets: inherit

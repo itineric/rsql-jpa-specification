@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.github.perplexhub</groupId>
+	<groupId>io.github.itineric</groupId>
 	<artifactId>rsql</artifactId>
 	<version>6.0.24-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>io.github.perplexhub - RSQL</name>
+	<name>io.github.itineric - RSQL</name>
 	<inceptionYear>2018</inceptionYear>
 	<description>Java library translate RSQL into Spring Data JPA Specification and QueryDSL Predicate.</description>
-	<url>https://github.com/perplexhub/rsql-jpa-specification</url>
+	<url>https://github.com/itineric/rsql-jpa-specification</url>
 	<licenses>
 		<license>
 			<name>MIT</name>
@@ -17,6 +17,9 @@
 	<developers>
 		<developer>
 			<name>perplexhub</name>
+		</developer>
+		<developer>
+			<name>itineric</name>
 		</developer>
 	</developers>
 	<properties>
@@ -40,9 +43,9 @@
 		<module>rsql-support</module>
 	</modules>
 	<scm>
-		<url>https://github.com/perplexhub/rsql-jpa-specification</url>
-		<connection>scm:git:https://github.com/perplexhub/rsql-jpa-specification.git</connection>
-		<developerConnection>scm:git:https://github.com/perplexhub/rsql-jpa-specification.git</developerConnection>
+		<url>https://github.com/itineric/rsql-jpa-specification</url>
+		<connection>scm:git:https://github.com/itineric/rsql-jpa-specification.git</connection>
+		<developerConnection>scm:git:https://github.com/itineric/rsql-jpa-specification.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<dependencyManagement>
@@ -89,18 +92,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.13</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-					<stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
-				</configuration>
-			</plugin>
-			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.10.1</version>
 				<executions>
@@ -146,81 +137,6 @@
 		</plugins>
 	</build>
 	<profiles>
-		<!-- Deployment profile (required so these plugins are only used when deploying) -->
-		<profile>
-			<id>deploy</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-enforcer-plugin</artifactId>
-						<version>3.0.0-M3</version>
-						<executions>
-							<execution>
-								<id>enforce-no-releases</id>
-								<goals>
-									<goal>enforce</goal>
-								</goals>
-								<configuration>
-									<rules>
-										<requireSnapshotVersion>
-											<message>No Releases Allowed!</message>
-										</requireSnapshotVersion>
-									</rules>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.4.1</version>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-								<configuration>
-									<!-- Prevent `gpg` from using pinentry programs -->
-									<gpgArguments>
-										<arg>--pinentry-mode</arg>
-										<arg>loopback</arg>
-									</gpgArguments>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 		<profile>
 			<id>release</id>
 			<build>
@@ -270,9 +186,8 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
+						<version>3.2.4</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -281,7 +196,6 @@
 									<goal>sign</goal>
 								</goals>
 								<configuration>
-									<!-- Prevent `gpg` from using pinentry programs -->
 									<gpgArguments>
 										<arg>--pinentry-mode</arg>
 										<arg>loopback</arg>
@@ -290,14 +204,19 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.6.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+							<autoPublish>true</autoPublish>
+							<waitUntil>published</waitUntil>
+						</configuration>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
