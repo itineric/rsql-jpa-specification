@@ -2,7 +2,9 @@ package io.github.perplexhub.rsql;
 
 import static io.github.perplexhub.rsql.RSQLOperators.*;
 
+import cz.jirutka.rsql.parser.ast.LogicalNode;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -336,21 +338,19 @@ public class RSQLJPAPredicateConverter extends RSQLVisitorBase<Predicate, From> 
 				return builder.notEqual(expression, argument);
 			}
 			if (op.equals(LIKE)) {
-				return likePredicate(expression.as(String.class), "%" + argument.toString() + "%", builder);
+				return likePredicate(expression, argument, false);
 			}
 			if (op.equals(NOT_LIKE)) {
-				return likePredicate(expression.as(String.class), "%" + argument.toString() + "%", builder).not();
+				return likePredicate(expression, argument, false).not();
 			}
 			if (op.equals(IGNORE_CASE)) {
 				return builder.equal(builder.upper(expression), argument.toString().toUpperCase());
 			}
 			if (op.equals(IGNORE_CASE_LIKE)) {
-				return likePredicate(builder.upper(expression), "%" + argument.toString()
-						.toUpperCase() + "%", builder);
+				return likePredicate(expression, argument, true);
 			}
 			if (op.equals(IGNORE_CASE_NOT_LIKE)) {
-				return likePredicate(builder.upper(expression), "%" + argument.toString()
-						.toUpperCase() + "%", builder).not();
+				return likePredicate(expression, argument, true).not();
 			}
 			if (op.equals(EQUAL)) {
 				return equalPredicate(expression, type, argument);
@@ -394,6 +394,20 @@ public class RSQLJPAPredicateConverter extends RSQLVisitorBase<Predicate, From> 
 				.orElseGet(() -> builder.like(attributePath, likeExpression));
 	}
 
+	private Predicate likePredicate(Expression<?> expression, Object argument, boolean ignoreCase) {
+		String argToUse = String.valueOf(argument);
+		Expression<String> strExpression = expression.as(String.class);
+		if (ignoreCase) {
+			if (HibernateSupport.isHibernateCriteriaBuilder(builder)) {
+				return HibernateSupport.ilike(builder, strExpression, argToUse, likeEscapeCharacter);
+			}
+
+			return likePredicate(builder.upper(strExpression), "%" + argToUse.toUpperCase(Locale.ROOT) + "%", builder);
+		}
+		
+		return likePredicate(strExpression, "%" + argToUse + "%", builder);
+	}
+
 	private Predicate equalPredicate(Expression expr, Class type, Object argument) {
 		if (type.equals(String.class)) {
 			String argStr = argument.toString();
@@ -423,14 +437,24 @@ public class RSQLJPAPredicateConverter extends RSQLVisitorBase<Predicate, From> 
 	@Override
 	public Predicate visit(AndNode node, From root) {
 		log.debug("visit(node:{},root:{})", node, root);
-
-		return node.getChildren().stream().map(n -> n.accept(this, root)).collect(Collectors.reducing(builder::and)).get();
+		return visitChildren(node, root, builder::and);
 	}
 
 	@Override
 	public Predicate visit(OrNode node, From root) {
 		log.debug("visit(node:{},root:{})", node, root);
+		return visitChildren(node, root, builder::or);
+	}
 
-		return node.getChildren().stream().map(n -> n.accept(this, root)).collect(Collectors.reducing(builder::or)).get();
+	private Predicate visitChildren(LogicalNode node, From root, BiFunction<Predicate, Predicate, Predicate> reducer) {
+		Predicate result = null;
+
+		for (var child : node) {
+			result = result != null 
+					? reducer.apply(result, child.accept(this, root))
+					: child.accept(this, root);
+		}
+
+		return result;
 	}
 }
